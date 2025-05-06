@@ -18,6 +18,7 @@ dependencies = [
     "scikit-learn>=1.6.1",
     "seaborn>=0.13.2",
     "sentence-transformers>=4.1.0",
+    "shap>=0.47.2",
     "spacy>=3.8.5",
     "textstat>=0.7.5",
     "torch>=2.7.0",

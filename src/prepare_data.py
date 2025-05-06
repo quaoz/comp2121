@@ -14,8 +14,7 @@ def load_jsonl(file_path):
 
 
 def extract_claim_evidence_pairs(claims, corpus_dict):
-    """
-    Extract claim-evidence pairs for classification.
+    """Extract claim-evidence pairs for classification.
 
     For each claim, create:
     - Positive examples: claim + evidence sentences that support/contradict the claim
@@ -50,7 +49,7 @@ def extract_claim_evidence_pairs(claims, corpus_dict):
                         "evidence": evidence_text,
                         "label": rationale["label"],
                         "is_evidence": 1,
-                    }
+                    },
                 )
 
                 # get sentence indices not in this evidence set
@@ -64,10 +63,13 @@ def extract_claim_evidence_pairs(claims, corpus_dict):
                 if non_evidence_indices:
                     # select a similar number of random non-evidence sentences
                     num_to_sample = min(
-                        len(rationale["sentences"]), len(non_evidence_indices)
+                        len(rationale["sentences"]),
+                        len(non_evidence_indices),
                     )
                     sampled_indices = np.random.choice(
-                        non_evidence_indices, num_to_sample, replace=False
+                        non_evidence_indices,
+                        num_to_sample,
+                        replace=False,
                     )
 
                     non_evidence_sentences = [
@@ -84,7 +86,7 @@ def extract_claim_evidence_pairs(claims, corpus_dict):
                             "evidence": non_evidence_text,
                             "label": "NO_RELATION",
                             "is_evidence": 0,
-                        }
+                        },
                     )
 
     return pd.DataFrame(data)

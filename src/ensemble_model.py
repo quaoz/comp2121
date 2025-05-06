@@ -3,8 +3,7 @@ import torch
 
 
 class EnsembleModel:
-    """
-    Ensemble model that combines traditional ML models with transformer predictions.
+    """Ensemble model that combines traditional ML models with transformer predictions.
     Uses a weighted voting approach to combine predictions.
     """
 
@@ -16,7 +15,7 @@ class EnsembleModel:
         bert_model,
         tokenizer,
         meta_classifier,
-    ):
+    ) -> None:
         self.device = device
         self.binary_classifier = binary_classifier
         self.relation_classifier = relation_classifier
@@ -28,14 +27,15 @@ class EnsembleModel:
 
         self.meta_classifier = meta_classifier
 
-    def train_meta_classifier(self, combined_features, labels):
+    def train_meta_classifier(self, combined_features, labels) -> None:
         """Train the meta-classifier to combine traditional and transformer predictions."""
         self.meta_classifier.fit(combined_features, labels)
 
     def get_bert_predictions(self, claims, evidences, batch_size=16):
         """Get predictions from the transformer model."""
         inputs = [
-            claim + " [SEP] " + evidence for claim, evidence in zip(claims, evidences)
+            claim + " [SEP] " + evidence
+            for claim, evidence in zip(claims, evidences, strict=False)
         ]
         all_probs = []
 
@@ -53,7 +53,8 @@ class EnsembleModel:
 
             with torch.no_grad():
                 outputs = self.bert_model(
-                    input_ids=input_ids, attention_mask=attention_mask
+                    input_ids=input_ids,
+                    attention_mask=attention_mask,
                 )
                 probs = torch.nn.functional.softmax(outputs.logits, dim=-1)
                 all_probs.append(probs.cpu().numpy())
@@ -61,8 +62,7 @@ class EnsembleModel:
         return np.vstack(all_probs)
 
     def predict(self, features_df, claims, evidences):
-        """
-        Make predictions using the ensemble.
+        """Make predictions using the ensemble.
 
         Args:
             features_df: DataFrame containing traditional features
@@ -71,6 +71,7 @@ class EnsembleModel:
 
         Returns:
             Predictions with three classes: 'SUPPORT', 'CONTRADICT', 'NO_RELATION'
+
         """
         # Get traditional model probabilities
         feature_columns = [
@@ -79,14 +80,14 @@ class EnsembleModel:
             if col not in ["claim_id", "doc_id", "label", "is_evidence"]
         ]
         binary_probs = self.binary_classifier.predict_proba(
-            features_df[feature_columns]
+            features_df[feature_columns],
         )
         relation_probs = np.zeros(
-            (len(features_df), 2)
+            (len(features_df), 2),
         )  # Default probabilities for all samples
         is_evidence_mask = features_df["is_evidence"] == 1
         relation_probs[is_evidence_mask] = self.relation_classifier.predict_proba(
-            features_df[feature_columns][is_evidence_mask]
+            features_df[feature_columns][is_evidence_mask],
         )
 
         # Get transformer model probabilities
@@ -96,6 +97,4 @@ class EnsembleModel:
         combined_probs = np.hstack([binary_probs, relation_probs, bert_probs])
 
         # Make predictions using the meta-classifier
-        final_predictions = self.meta_classifier.predict(combined_probs)
-
-        return final_predictions
+        return self.meta_classifier.predict(combined_probs)

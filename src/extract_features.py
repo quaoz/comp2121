@@ -10,7 +10,8 @@ def extract_sbert_features(sbert_model, claim, evidence):
     evidence_embedding = sbert_model.encode(evidence)
     return {
         "sbert_cosine_similarity": cosine_similarity(
-            [claim_embedding], [evidence_embedding]
+            [claim_embedding],
+            [evidence_embedding],
         )[0][0],
         "sbert_claim_embedding": claim_embedding,
         "sbert_evidence_embedding": evidence_embedding,
@@ -25,7 +26,8 @@ def extract_linguistic_features(spacy_model, claim, evidence):
     features["claim_length"] = len(claim)
     features["evidence_length"] = len(evidence)
     features["length_ratio"] = features["claim_length"] / max(
-        features["evidence_length"], 1
+        features["evidence_length"],
+        1,
     )
 
     # Tokenization
@@ -40,10 +42,12 @@ def extract_linguistic_features(spacy_model, claim, evidence):
 
     # Lexical richness
     features["claim_lexical_density"] = features["claim_unique_tokens"] / max(
-        features["claim_token_count"], 1
+        features["claim_token_count"],
+        1,
     )
     features["evidence_lexical_density"] = features["evidence_unique_tokens"] / max(
-        features["evidence_token_count"], 1
+        features["evidence_token_count"],
+        1,
     )
 
     # Readability scores
@@ -59,15 +63,16 @@ def extract_linguistic_features(spacy_model, claim, evidence):
 
     features["token_overlap"] = len(overlap)
     features["token_overlap_ratio"] = len(overlap) / max(
-        len(claim_set.union(evidence_set)), 1
+        len(claim_set.union(evidence_set)),
+        1,
     )
 
     # Named entity overlap
     claim_doc = spacy_model(claim)
     evidence_doc = spacy_model(evidence)
 
-    claim_entities = set([ent.text.lower() for ent in claim_doc.ents])
-    evidence_entities = set([ent.text.lower() for ent in evidence_doc.ents])
+    claim_entities = {ent.text.lower() for ent in claim_doc.ents}
+    evidence_entities = {ent.text.lower() for ent in evidence_doc.ents}
 
     entity_overlap = claim_entities.intersection(evidence_entities)
     features["entity_overlap"] = len(entity_overlap)
@@ -78,32 +83,28 @@ def extract_linguistic_features(spacy_model, claim, evidence):
     )
 
     # Hedge words and certainty markers
-    hedge_words = set(
-        [
-            "may",
-            "might",
-            "could",
-            "suggest",
-            "indicate",
-            "possible",
-            "potential",
-            "likely",
-            "probably",
-        ]
-    )
-    certainty_words = set(
-        [
-            "prove",
-            "confirm",
-            "demonstrate",
-            "establish",
-            "verify",
-            "definitely",
-            "certainly",
-            "clearly",
-            "indeed",
-        ]
-    )
+    hedge_words = {
+        "may",
+        "might",
+        "could",
+        "suggest",
+        "indicate",
+        "possible",
+        "potential",
+        "likely",
+        "probably",
+    }
+    certainty_words = {
+        "prove",
+        "confirm",
+        "demonstrate",
+        "establish",
+        "verify",
+        "definitely",
+        "certainly",
+        "clearly",
+        "indeed",
+    }
 
     claim_text_lower = claim.lower()
     evidence_text_lower = evidence.lower()
@@ -122,9 +123,7 @@ def extract_linguistic_features(spacy_model, claim, evidence):
     )
 
     # Negation features
-    negation_words = set(
-        ["not", "no", "never", "n't", "none", "neither", "nor", "without"]
-    )
+    negation_words = {"not", "no", "never", "n't", "none", "neither", "nor", "without"}
     features["claim_negation_count"] = sum(
         1 for word in negation_words if word in claim_text_lower
     )

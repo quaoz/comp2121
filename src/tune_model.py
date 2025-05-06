@@ -11,7 +11,7 @@ id_to_label = {v: k for k, v in label_to_id.items()}
 
 # Create dataset class
 class ScifactDataset(Dataset):
-    def __init__(self, dataframe, tokenizer, max_length=512):
+    def __init__(self, dataframe, tokenizer, max_length=512) -> None:
         self.dataframe = dataframe
         self.tokenizer = tokenizer
         self.max_length = max_length
@@ -19,7 +19,7 @@ class ScifactDataset(Dataset):
         # Convert labels
         self.dataframe["label_id"] = self.dataframe["label"].map(label_to_id)
 
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self.dataframe)
 
     def __getitem__(self, idx):
@@ -50,7 +50,12 @@ class ScifactDataset(Dataset):
 
 # Training function
 def train_model(
-    device, model, train_dataloader, eval_dataloader, epochs=3, learning_rate=2e-5
+    device,
+    model,
+    train_dataloader,
+    eval_dataloader,
+    epochs,
+    learning_rate=2e-5,
 ):
     model.to(device)
     optimizer = AdamW(model.parameters(), lr=learning_rate)
@@ -69,7 +74,9 @@ def train_model(
             labels = batch["labels"].to(device)
 
             outputs = model(
-                input_ids=input_ids, attention_mask=attention_mask, labels=labels
+                input_ids=input_ids,
+                attention_mask=attention_mask,
+                labels=labels,
             )
 
             loss = outputs.loss
