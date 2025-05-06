@@ -1,0 +1,31 @@
+[project]
+name = "comp2121"
+version = "0.1.0"
+description = "comp2121 coursework"
+requires-python = "==3.12.*"
+dependencies = [
+    "en-core-web-lg",
+    "en-core-web-md",
+    "en-core-web-sm",
+    "hf-xet>=1.1.0",
+    "ipython>=9.2.0",
+    "joblib>=1.5.0",
+    "matplotlib>=3.10.1",
+    "nltk>=3.9.1",
+    "numpy>=2.2.5",
+    "optuna>=4.3.0",
+    "pandas>=2.2.3",
+    "scikit-learn>=1.6.1",
+    "seaborn>=0.13.2",
+    "sentence-transformers>=4.1.0",
+    "spacy>=3.8.5",
+    "textstat>=0.7.5",
+    "torch>=2.7.0",
+    "tqdm>=4.67.1",
+    "transformers>=4.51.3",
+]
+
+[tool.uv.sources]
+en-core-web-sm = { url = "https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.8.0/en_core_web_sm-3.8.0-py3-none-any.whl" }
+en-core-web-md = { url = "https://github.com/explosion/spacy-models/releases/download/en_core_web_md-3.8.0/en_core_web_md-3.8.0-py3-none-any.whl" }
+en-core-web-lg = { url = "https://github.com/explosion/spacy-models/releases/download/en_core_web_lg-3.8.0/en_core_web_lg-3.8.0-py3-none-any.whl" }

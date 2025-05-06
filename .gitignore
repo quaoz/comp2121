@@ -1,0 +1,14 @@
+data/
+
+# python
+.ropeproject/
+.venv/
+.ipynb_checkpoints/
+.ruff_cache/
+__pycache__/
+
+# nix
+.direnv/
+
+# darwin
+.DS_Store
