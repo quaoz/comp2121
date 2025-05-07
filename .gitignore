@@ -9,6 +9,7 @@ __pycache__/
 
 # nix
 .direnv/
+/result
 
 # darwin
 .DS_Store
