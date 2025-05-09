@@ -104,21 +104,37 @@
           ++ (spacy-models pkgs).all);
   in {
     packages = forAllSystems (pkgs: {
-      default = self.packages.${pkgs.system}.lab;
+      default = pkgs.writeShellScriptBin "comp2121" ''
+        export NLTK_DATA="${data pkgs}/nltk"
+        export SCIFACT_DATA="${data pkgs}/scifact"
 
-      lab = pkgs.writeShellScriptBin "launch-lab" ''
-        exec ${pythonSet pkgs}/bin/python -m jupyter lab ${self}/src/pipeline.ipynb
-      '';
+        if [[ -f ./src/pipeline.ipynb ]]; then
+            notebook="./src/pipeline.ipynb"
+        elif [[ -f ./pipeline.ipynb ]]; then
+            notebook="./pipeline.ipynb"
+        else
+            echo "Running from nix-store, changes will not be saved"
+            notebook="${self}/src/pipeline.ipynb"
+        fi
 
-      notebook = pkgs.writeShellScriptBin "launch-notebook" ''
-        exec ${pythonSet pkgs}/bin/python -m jupyter lab ${self}/src/pipeline.ipynb
+        mode="''${1:-lab}"
+        mode="''${mode,,}"
+        case "$mode" in
+        lab | notebook)
+            exec ${pythonSet pkgs}/bin/python -m jupyter "$mode" "$notebook"
+            ;;
+        *)
+            echo "Usage: nix run .# -- [lab|notebook]"
+            exit 1
+            ;;
+        esac
       '';
     });
 
     apps = forAllSystems (pkgs: {
       default = {
         type = "app";
-        program = "${self.packages.${pkgs.system}.default}/bin/launch-lab";
+        program = "${self.packages.${pkgs.system}.default}/bin/comp2121";
       };
     });
 
